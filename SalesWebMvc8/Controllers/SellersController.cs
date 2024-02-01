@@ -40,6 +40,12 @@ namespace SalesWebMvc8.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Seller seller)
         {
+            if (!ModelState.IsValid)
+            {
+                List<Department> departments = await _departmentService.FindAllAsync();
+                SellerFormViewModel viewModel = new SellerFormViewModel { Seller = seller, Departments = departments };
+                return View(viewModel);
+            }
             await _sellerService.InsertAsync(seller);
             return RedirectToAction(nameof(Index));
         }
@@ -105,6 +111,12 @@ namespace SalesWebMvc8.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Seller seller, int id)
         {
+            if (!ModelState.IsValid)
+            {
+                List<Department> departments = await _departmentService.FindAllAsync();
+                SellerFormViewModel viewModel = new SellerFormViewModel { Seller = seller, Departments = departments };
+                return View(viewModel);
+            }
             if (id != seller.Id)
             {
                 return RedirectToAction(nameof(Error), new { message = "Id mismatch" });
