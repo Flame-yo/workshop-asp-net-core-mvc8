@@ -35,14 +35,21 @@ namespace SalesWebMvc8.Services
 
         public async Task RemoveAsync(int id)
         {
-            Seller seller = await _context.Seller.FindAsync(id);
-            _context.Seller.Remove(seller);
-            await _context.SaveChangesAsync();
+            try
+            {
+                Seller seller = await _context.Seller.FindAsync(id);
+                _context.Seller.Remove(seller);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                throw new IntegrityException("Can't delete this seller because he/she has sales");
+            }
         }
 
         public async Task UpdateAsync(Seller seller)
         {
-            if (! await _context.Seller.AnyAsync(s => s.Id == seller.Id))
+            if (!await _context.Seller.AnyAsync(s => s.Id == seller.Id))
             {
                 throw new NotFoundException("Id not found");
             }
